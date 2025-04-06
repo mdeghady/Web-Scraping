@@ -4,7 +4,7 @@ import scrapy
 class BrandsspiderSpider(scrapy.Spider):
     name = "BrandsSpider"
     allowed_domains = ["wardow.com"]
-    start_urls = ["https://www.wardow.com/marken"]
+    start_urls = ["https://www.wardow.com/en/brands"]
 
     def parse(self, response):
         """
