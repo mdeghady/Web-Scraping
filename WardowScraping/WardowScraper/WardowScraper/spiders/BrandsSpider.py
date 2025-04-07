@@ -111,6 +111,11 @@ class BrandsspiderSpider(scrapy.Spider):
         :param response: The response object containing the HTML content of the product page.
         :return: A dictionary containing product details.
         """
+        # Extract the first image URL & number of available images
+        all_product_images = response.css('img.gallery-image::attr(src)').getall()
+        first_image_url = all_product_images[0]
+        number_of_images = len(all_product_images)
+
         # The Website Stores the product details in a div with class "product-essential"
         product_details = response.css('div.product-essential')
 
@@ -158,6 +163,8 @@ class BrandsspiderSpider(scrapy.Spider):
             "brand_name": brand_name,
             "product_name": product_name,
             "product_url": product_url,
+            "first_image_url" :  first_image_url,
+            "number_of_images" : number_of_images,
             "product_color": product_color,
             "product_tags": product_tags,
             "old_price": old_price,
