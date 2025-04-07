@@ -271,7 +271,8 @@ class BrandsspiderSpider(scrapy.Spider):
         stock_status = product_info.css('p.availability span::text').getall()
 
         availability_note = product_info.css('p.availability::text').getall()
-        availability_note = self._clean_strings(availability_note)[-1]
+        availability_note = self._clean_strings(availability_note)
+        availability_note = availability_note[-1] if len(availability_note)>0 else None
 
         stock_quantity_left = product_info.css('p.availability-only strong::text').get()
         stock_quantity_left = int(stock_quantity_left) if stock_quantity_left is not None else None
