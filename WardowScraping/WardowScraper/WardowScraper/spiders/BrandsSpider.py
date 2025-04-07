@@ -210,20 +210,37 @@ class BrandsspiderSpider(scrapy.Spider):
         old_price = price_data.css('p.old-price span.price::text').get()
         if old_price:
             # If the product has discount, extract the old price and the new price
-            old_price = old_price.replace(",", ".").replace("€", "").strip()
+            old_price = self._clean_price_string(old_price)
             new_price = price_data.css('p.special-price span.price meta[itemprop="price"]::attr(content)').get()
-            new_price = new_price.replace(",", ".").replace("€", "").strip()
+            new_price = self._clean_price_string(new_price)
             price_currency = price_data.css('meta[itemprop="priceCurrency"]::attr(content)').get()
+            
         else:
             # If the product doesn't have discount, extract the regular price
             old_price = 0
             new_price = price_data.css('span.regular-price span.price::text').get()
-            new_price = new_price.replace(",", ".").replace("€", "").strip()
+            new_price = self._clean_price_string(new_price)
             price_currency = price_data.css('meta[itemprop="priceCurrency"]::attr(content)').get()
-        # Convert the prices to float
-        old_price = float(old_price)
-        new_price = float(new_price)
 
         return old_price, new_price, price_currency
+
+    def _clean_price_string(self , price_string):
+        """
+        Clean the price string to delete the currency symbol and return the price as float type
+        :param price_string:
+        :return:
+        """
+        # Remove any non-digit, non-dot, and non-comma characters (e.g., currency symbols)
+        cleaned = re.sub(r'[^\d,.-]', '', price_string)
+
+        # If the number uses comma as thousands separator, remove it
+        # and if dot is used for decimals, keep it
+        if ',' in cleaned and '.' in cleaned:
+            cleaned = cleaned.replace(',', '')  # remove comma (thousands separator)
+        elif ',' in cleaned:
+            # assume European format: e.g., '3.384,30' => '3384.30'
+            cleaned = cleaned.replace('.', '').replace(',', '.')
+
+        return float(cleaned)
 
 
