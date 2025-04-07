@@ -132,7 +132,7 @@ class BrandsspiderSpider(scrapy.Spider):
 
         # Extract Product Price
         price_data = product_shop.css('div.price-info')
-        old_price, new_price, price_currency = self._parse_price_data(price_data)
+        old_price, new_price, price_currency , discount_amount = self._parse_price_data(price_data)
 
         # Extract description Section
         description_details = product_details.css('div.description-details li::text').getall()
@@ -169,6 +169,7 @@ class BrandsspiderSpider(scrapy.Spider):
             "product_tags": product_tags,
             "old_price": old_price,
             "new_price": new_price,
+            "discount_amount" : discount_amount,
             "price_currency": price_currency,
             "description_details": description_details,
             "description_inside": description_inside,
@@ -214,15 +215,19 @@ class BrandsspiderSpider(scrapy.Spider):
             new_price = price_data.css('p.special-price span.price meta[itemprop="price"]::attr(content)').get()
             new_price = self._clean_price_string(new_price)
             price_currency = price_data.css('meta[itemprop="priceCurrency"]::attr(content)').get()
-            
+            # Extract the discount amount
+            discount_amount =  price_data.css('div.price-info__sale span.price::text').get()
+            discount_amount = self._clean_price_string(discount_amount)
         else:
             # If the product doesn't have discount, extract the regular price
+            # No old price or discount amount
             old_price = 0
+            discount_amount = 0
             new_price = price_data.css('span.regular-price span.price::text').get()
             new_price = self._clean_price_string(new_price)
             price_currency = price_data.css('meta[itemprop="priceCurrency"]::attr(content)').get()
 
-        return old_price, new_price, price_currency
+        return old_price, new_price, price_currency , discount_amount
 
     def _clean_price_string(self , price_string):
         """
