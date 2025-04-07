@@ -125,10 +125,11 @@ class BrandsspiderSpider(scrapy.Spider):
         # Get Product URL
         product_url = response.url
 
-        # Product Shop Details [Name, Price, Color]
+        # Product Shop Details [Name, Price, Color,Availability]
         product_shop  = product_details.css('div.product-shop')
         product_name  = product_shop.css('span.product-name::text').get() # Extract Product Name
         product_color = product_shop.css('div.colors p.headline span::text').get() # Extract Product Color
+        stock_status , availability_note , stock_quantity_left = self._extract_stock_details(product_shop)
 
         # Extract Product Price
         price_data = product_shop.css('div.price-info')
@@ -163,6 +164,9 @@ class BrandsspiderSpider(scrapy.Spider):
             "brand_name": brand_name,
             "product_name": product_name,
             "product_url": product_url,
+            "stock_status": stock_status,
+            "availability_note": availability_note,
+            "stock_quantity_left": stock_quantity_left,
             "first_image_url" :  first_image_url,
             "number_of_images" : number_of_images,
             "product_color": product_color,
@@ -247,5 +251,34 @@ class BrandsspiderSpider(scrapy.Spider):
             cleaned = cleaned.replace('.', '').replace(',', '.')
 
         return float(cleaned)
+
+    def _extract_stock_details(self , product_info):
+        """
+        Extract the availability info for the product
+        It may appear like this
+        In stock. Immediately available Only 1 left!
+        and return in three variables like
+        stock_status: In stock
+        availability_note: Immediately available
+        stock_quantity_left: 1
+
+        :param product_info: response for the product-shop div element in the product page
+        :return:
+        stock_status(str): stock availability status e.g. In stock
+        availability_note(str): availability note for the product e.g. Immediately available
+        stock_quantity_left(int): number of left stock if available
+        """
+        stock_status = product_info.css('p.availability span::text').getall()
+
+        availability_note = product_info.css('p.availability::text').getall()
+        availability_note = self._clean_strings(availability_note)[-1]
+
+        stock_quantity_left = product_info.css('p.availability-only strong::text').get()
+        stock_quantity_left = int(stock_quantity_left) if stock_quantity_left is not None else None
+
+        return stock_status , availability_note , stock_quantity_left
+
+
+
 
 
