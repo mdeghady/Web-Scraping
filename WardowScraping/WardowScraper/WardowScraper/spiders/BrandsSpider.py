@@ -131,7 +131,7 @@ class BrandsspiderSpider(scrapy.Spider):
         product_color = product_shop.css('div.colors p.headline span::text').get() # Extract Product Color
 
         # Extract Product Price
-        price_data = product_shop.css('div.price-box')
+        price_data = product_shop.css('div.price-info')
         old_price, new_price, price_currency = self._parse_price_data(price_data)
 
         # Extract description Section
