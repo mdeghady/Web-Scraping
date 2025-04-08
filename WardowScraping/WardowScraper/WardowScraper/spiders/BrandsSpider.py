@@ -97,12 +97,12 @@ class BrandsspiderSpider(scrapy.Spider):
                 # If the color URL is None, it means this is the current color
                 # Which is displayed in the product page
                 yield self.extract_product_data(response)
-            else:
-                # If the color URL is not None, it means this is a different color
-                # Follow the color URL to get the product details
-                yield response.follow(color_url,
-                                      callback=self.extract_product_data,
-                                      meta={"brand_name": response.meta["brand_name"]})
+            # else:
+            #     # If the color URL is not None, it means this is a different color
+            #     # Follow the color URL to get the product details
+            #     yield response.follow(color_url,
+            #                           callback=self.extract_product_data,
+            #                           meta={"brand_name": response.meta["brand_name"]})
 
 
     def extract_product_data(self, response):
