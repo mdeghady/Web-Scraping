@@ -12,6 +12,10 @@ BOT_NAME = "WardowScraper"
 SPIDER_MODULES = ["WardowScraper.spiders"]
 NEWSPIDER_MODULE = "WardowScraper.spiders"
 
+# Extract Data in CSV Format
+FEEDS = {
+    'WardowData.csv' : {'format' : 'csv'}
+}
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "WardowScraper (+http://www.yourdomain.com)"
